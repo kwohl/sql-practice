@@ -33,3 +33,48 @@ GROUP BY vm.name
 ORDER BY number_sold DESC;
 
 -- Which employee type sold the most of that make?
+
+-- solution where 'sold' means purchased
+SELECT et.name, COUNT (s.sales_type_id) as number_sold
+	FROM employeetypes et
+	JOIN employees e ON et.employee_type_id = e.employee_type_id
+	JOIN sales s ON s.employee_id = e.employee_id
+	AND s.sales_type_id = 1
+	JOIN vehicles v ON s.vehicle_id = v.vehicle_id
+	JOIN vehicletypes vt ON v.vehicle_type_id = vt.vehicle_type_id
+	JOIN vehiclemakes vma ON vt.make_id = vma.vehicle_make_id
+	WHERE vma.name = (
+	    SELECT vm.name
+	FROM vehiclemakes vm
+	JOIN vehicletypes vt ON vm.vehicle_make_id = vt.make_id
+	JOIN vehicles v ON vt.vehicle_type_id = v.vehicle_type_id
+	JOIN sales s ON v.vehicle_id = s.vehicle_id
+	JOIN salestypes st ON s.sales_type_id = st.sales_type_id
+	GROUP BY vm.name
+	ORDER BY COUNT (vm.name) DESC
+		LIMIT 1
+	)
+GROUP BY et.name
+ORDER BY number_sold DESC;
+
+-- solution where 'sold' includes both purchases and leases
+SELECT et.name, COUNT (s.sales_type_id) as number_sold
+	FROM employeetypes et
+	JOIN employees e ON et.employee_type_id = e.employee_type_id
+	JOIN sales s ON s.employee_id = e.employee_id
+	JOIN vehicles v ON s.vehicle_id = v.vehicle_id
+	JOIN vehicletypes vt ON v.vehicle_type_id = vt.vehicle_type_id
+	JOIN vehiclemakes vma ON vt.make_id = vma.vehicle_make_id
+	WHERE vma.name = (
+			SELECT vm.name
+		FROM vehiclemakes vm
+		JOIN vehicletypes vt ON vm.vehicle_make_id = vt.make_id
+		JOIN vehicles v ON vt.vehicle_type_id = v.vehicle_type_id
+		JOIN sales s ON v.vehicle_id = s.vehicle_id
+		JOIN salestypes st ON s.sales_type_id = st.sales_type_id
+		GROUP BY vm.name
+		ORDER BY COUNT (vm.name) DESC
+			LIMIT 1
+	)
+GROUP BY et.name
+ORDER BY number_sold DESC;
