@@ -1,3 +1,5 @@
+--FILTERING DATA
+
 -- Write a query that returns the business name, city, state, and website for each dealership. Use an alias for the Dealerships table.
 SELECT business_name, city, state, website
 FROM dealerships d;
